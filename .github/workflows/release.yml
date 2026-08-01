@@ -1,0 +1,146 @@
+name: Release after merge
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    runs-on: windows-latest
+    timeout-minutes: 15
+    concurrency:
+      group: nvme-stack-pilot-release
+      queue: max
+
+    steps:
+      - name: Check out the merged revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Determine next patch version
+        id: version
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $latestVersion = $null
+          foreach ($tag in (git tag --list 'v*')) {
+            if ($tag -notmatch '^v(?<version>\d+\.\d+\.\d+)$') {
+              continue
+            }
+
+            $candidate = [version]$Matches.version
+            if ($null -eq $latestVersion -or $candidate -gt $latestVersion) {
+              $latestVersion = $candidate
+            }
+          }
+
+          if ($null -eq $latestVersion) {
+            $nextVersion = [version]'1.0.0'
+          } else {
+            $nextVersion = [version]::new(
+              $latestVersion.Major,
+              $latestVersion.Minor,
+              $latestVersion.Build + 1
+            )
+          }
+
+          "version=$nextVersion" >> $env:GITHUB_OUTPUT
+          "tag=v$nextVersion" >> $env:GITHUB_OUTPUT
+
+      - name: Restore dependencies
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          dotnet restore NvmeDriverSwitch.sln
+
+      - name: Run tests
+        shell: pwsh
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          dotnet test NvmeDriverSwitch.sln `
+            --configuration Release `
+            --no-restore `
+            --property:Platform=x64 `
+            --property:Version=$env:RELEASE_VERSION
+
+      - name: Build release executable
+        shell: pwsh
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          dotnet build src/NvmeDriverSwitch/NvmeDriverSwitch.csproj `
+            --configuration Release `
+            --no-restore `
+            --property:Platform=x64 `
+            --property:Version=$env:RELEASE_VERSION
+
+      - name: Package release assets
+        shell: pwsh
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $buildDirectory = Join-Path $env:GITHUB_WORKSPACE 'src/NvmeDriverSwitch/bin/x64/Release/net481'
+          $packageDirectory = Join-Path $env:RUNNER_TEMP 'NvmeStackPilot'
+          $archiveName = "NvmeStackPilot-v$env:RELEASE_VERSION-win-x64.zip"
+          $archivePath = Join-Path $env:GITHUB_WORKSPACE $archiveName
+          $checksumPath = "$archivePath.sha256"
+
+          New-Item -ItemType Directory -Path $packageDirectory -Force | Out-Null
+          Copy-Item -LiteralPath (Join-Path $buildDirectory 'NvmeStackPilot.exe') -Destination $packageDirectory
+          Copy-Item -LiteralPath (Join-Path $buildDirectory 'NvmeStackPilot.exe.config') -Destination $packageDirectory
+          Copy-Item -LiteralPath (Join-Path $env:GITHUB_WORKSPACE 'README.md') -Destination $packageDirectory
+
+          Compress-Archive -Path (Join-Path $packageDirectory '*') -DestinationPath $archivePath
+
+          $hash = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash
+          [System.IO.File]::WriteAllText(
+            $checksumPath,
+            "$hash  $archiveName`n",
+            [System.Text.Encoding]::ASCII
+          )
+
+      - name: Create GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+
+          $archivePath = Join-Path $env:GITHUB_WORKSPACE "NvmeStackPilot-v$env:RELEASE_VERSION-win-x64.zip"
+          $checksumPath = "$archivePath.sha256"
+
+          gh release create $env:RELEASE_TAG `
+            $archivePath `
+            $checksumPath `
+            --repo $env:GITHUB_REPOSITORY `
+            --target $env:GITHUB_SHA `
+            --title "NVMe Stack Pilot $env:RELEASE_TAG" `
+            --generate-notes `
+            --fail-on-no-commits
