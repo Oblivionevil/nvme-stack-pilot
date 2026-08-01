@@ -49,7 +49,9 @@ namespace NvmeDriverSwitch.ViewModels
                 () => _hasSnapshot && !_isBusy && !_isMutating);
 
             _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
-            _timer.Tick += (s, e) => { var ignore = RefreshAsync(); };
+            // Der Hintergrund-Ping darf die Schaltflaechen nicht kurz deaktivieren;
+            // sonst blinken sie im Fuenf-Sekunden-Takt. Er laeuft deshalb still.
+            _timer.Tick += (s, e) => { var ignore = RefreshAsync(silent: true); };
         }
 
         // ---- Sammlungen ----
@@ -115,6 +117,7 @@ namespace NvmeDriverSwitch.ViewModels
 
         /// <summary>Wiedereintritts-Sperre fuer RefreshAsync und Schreibaktionen.</summary>
         private bool _isBusy;
+        private bool _isRefreshing;
         private bool _isMutating;
         private bool _hasSnapshot;
 
@@ -369,13 +372,19 @@ namespace NvmeDriverSwitch.ViewModels
         public void Start()
         {
             _timer.Start();
-            var ignore = RefreshAsync();
+            var ignore = RefreshAsync(silent: true);
         }
 
-        public async Task RefreshAsync()
+        /// <summary>
+        /// Aktualisiert den Status. Bei <paramref name="silent"/> bleibt der sichtbare
+        /// Busy-Zustand der Schaltflaechen unveraendert (Hintergrund-Ping); der interne
+        /// Lock verhindert trotzdem ueberlappende Refreshes und Schreibaktionen.
+        /// </summary>
+        public async Task RefreshAsync(bool silent = false)
         {
-            if (_isBusy || _isMutating) return;
-            SetBusy(true);
+            if (_isBusy || _isMutating || _isRefreshing) return;
+            _isRefreshing = true;
+            if (!silent) SetBusy(true);
             try
             {
                 var snapshot = await Task.Run(() => BuildSnapshot());
@@ -390,7 +399,8 @@ namespace NvmeDriverSwitch.ViewModels
             }
             finally
             {
-                SetBusy(false);
+                if (!silent) SetBusy(false);
+                _isRefreshing = false;
             }
         }
 
@@ -702,7 +712,9 @@ namespace NvmeDriverSwitch.ViewModels
 
         private bool TryBeginMutation()
         {
-            if (!CanMutate) return false;
+            // Auch waehrend eines stillen Hintergrund-Refreshes keine Registry-Aenderung
+            // starten, sonst koennte ein gerade gelesener Snapshot sie wieder uebermalen.
+            if (!CanMutate || _isRefreshing) return false;
             _isMutating = true;
             _timer.Stop();
             CommandManager.InvalidateRequerySuggested();
