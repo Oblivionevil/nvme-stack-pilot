@@ -1,0 +1,23 @@
+# Visual Studio / .NET build output
+.vs/
+**/bin/
+**/obj/
+TestResults/
+artifacts/
+
+# User- and machine-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Test and coverage output
+*.trx
+*.coverage
+*.coveragexml
+coverage/
+
+# Operating-system files
+.DS_Store
+Thumbs.db
+Desktop.ini
