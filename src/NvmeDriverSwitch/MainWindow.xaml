@@ -1,6 +1,7 @@
 <Window x:Class="NvmeDriverSwitch.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="clr-namespace:NvmeDriverSwitch.Infrastructure"
         Title="NVMe Stack Pilot"
         Height="880" Width="1000" MinHeight="600" MinWidth="820"
         SizeToContent="Height"
@@ -34,9 +35,9 @@
             <TextBlock Text="{Binding StatusHeadline}" FontSize="21" FontWeight="SemiBold"
                        Foreground="{Binding StatusBrush}" />
             <TextBlock Margin="0,8,0,0" TextWrapping="Wrap">
-              <Run Text="Laufend:" Foreground="#FF9AA0A8" /><Run Text=" " /><Run Text="{Binding RuntimeModeText, Mode=OneWay}" />
+              <Run Text="{l:Loc StatusRunningLabel}" Foreground="#FF9AA0A8" /><Run Text=" " /><Run Text="{Binding RuntimeModeText, Mode=OneWay}" />
               <Run Text="   ·   " Foreground="#FF5A6068" />
-              <Run Text="Konfiguriert:" Foreground="#FF9AA0A8" /><Run Text=" " /><Run Text="{Binding ConfiguredModeText, Mode=OneWay}" />
+              <Run Text="{l:Loc StatusConfiguredLabel}" Foreground="#FF9AA0A8" /><Run Text=" " /><Run Text="{Binding ConfiguredModeText, Mode=OneWay}" />
             </TextBlock>
             <TextBlock Margin="0,4,0,0" Text="{Binding VerdictText}" FontWeight="SemiBold"
                        Foreground="{Binding StatusBrush}" />
@@ -49,7 +50,7 @@
               Background="{StaticResource WarnBg}" BorderBrush="{StaticResource Warn}"
               Visibility="{Binding RebootBannerVisibility}">
         <DockPanel>
-          <Button DockPanel.Dock="Right" Content="Jetzt neu starten" Style="{StaticResource PrimaryButton}"
+          <Button DockPanel.Dock="Right" Content="{l:Loc RebootNow}" Style="{StaticResource PrimaryButton}"
                   Command="{Binding RebootCommand}" VerticalAlignment="Center" Margin="12,0,0,0" />
           <StackPanel VerticalAlignment="Center">
             <TextBlock Text="{Binding RebootBannerTitle}"
@@ -65,25 +66,25 @@
               Background="{StaticResource BadBg}" BorderBrush="{StaticResource Bad}"
               Visibility="{Binding IgnoredHintVisibility}">
         <StackPanel>
-          <TextBlock Text="Windows hat die Overrides ignoriert." FontWeight="SemiBold"
+          <TextBlock Text="{l:Loc IgnoredTitle}" FontWeight="SemiBold"
                      Foreground="{StaticResource Bad}" />
           <TextBlock Style="{StaticResource Muted}" Margin="0,6,0,0" TextWrapping="Wrap"
-                     Text="Seit dem Setzen der Werte lag bereits ein Neustart, der Zustand hat sich trotzdem nicht geändert. Für neuere 24H2-Builds ist keine bestätigte Registry-only-Aktivierung dokumentiert; Microsoft unterstützt den nativen Stack offiziell nur unter Server 2025. Der bekannte Ausweichweg ist ViVeTool mit den Feature-IDs 60786016 und 48433719 — diese App ruft ViVeTool bewusst nicht auf." />
+                     Text="{l:Loc IgnoredDetail}" />
         </StackPanel>
       </Border>
 
       <!-- ============ Aktionen ============ -->
       <Border Style="{StaticResource CardPanel}" Margin="0,10,0,0">
         <StackPanel>
-          <TextBlock Style="{StaticResource SectionHeader}" Text="TREIBER UMSCHALTEN" />
+          <TextBlock Style="{StaticResource SectionHeader}" Text="{l:Loc ActionsHeader}" />
           <StackPanel Orientation="Horizontal">
-            <Button Content="Nativen Treiber aktivieren" Style="{StaticResource PrimaryButton}"
+            <Button Content="{l:Loc EnableNativeButton}" Style="{StaticResource PrimaryButton}"
                     Command="{Binding EnableNativeCommand}" MinWidth="220" />
-            <Button Content="Zurück auf klassischen Treiber" Margin="10,0,0,0"
+            <Button Content="{l:Loc DisableNativeButton}" Margin="10,0,0,0"
                     Command="{Binding DisableNativeCommand}" MinWidth="220" />
           </StackPanel>
           <TextBlock Style="{StaticResource Muted}" Margin="2,10,0,0" TextWrapping="Wrap"
-                     Text="Beide Aktionen zeigen vorher die exakten Registry-Operationen im Klartext. Es wird ausschließlich der bestätigte Minimalsatz geschrieben — andere Feature-Overrides bleiben unangetastet." />
+                     Text="{l:Loc ActionsDetail}" />
         </StackPanel>
       </Border>
 
@@ -91,7 +92,7 @@
       <Border Style="{StaticResource CardPanel}" Margin="0,10,0,0"
               Visibility="{Binding PreflightVisibility}">
         <StackPanel>
-          <TextBlock Style="{StaticResource SectionHeader}" Text="VORFLUGPRÜFUNG" />
+          <TextBlock Style="{StaticResource SectionHeader}" Text="{l:Loc PreflightHeader}" />
           <ItemsControl ItemsSource="{Binding PreflightIssues}">
             <ItemsControl.ItemTemplate>
               <DataTemplate>
@@ -110,7 +111,7 @@
       <!-- ============ Registry ============ -->
       <Border Style="{StaticResource CardPanel}" Margin="0,10,0,0">
         <StackPanel>
-          <TextBlock Style="{StaticResource SectionHeader}" Text="FEATUREMANAGEMENT-OVERRIDES" />
+          <TextBlock Style="{StaticResource SectionHeader}" Text="{l:Loc RegistryHeader}" />
           <TextBlock Style="{StaticResource Muted}" Text="{Binding OverridesPathText}"
                      FontFamily="Consolas" Margin="2,0,0,8" />
 
@@ -133,16 +134,16 @@
             </DataGrid.RowStyle>
 
             <DataGrid.Columns>
-              <DataGridTextColumn Header="Wert" Binding="{Binding Name}" Width="130"
+              <DataGridTextColumn Header="{l:Loc ColumnValue}" Binding="{Binding Name}" Width="130"
                                   FontFamily="Consolas" />
-              <DataGridTextColumn Header="Daten" Binding="{Binding Data}" Width="70" />
-              <DataGridTextColumn Header="Typ" Binding="{Binding Kind}" Width="100" />
-              <DataGridTextColumn Header="Rolle" Binding="{Binding RoleText}" Width="110" />
-              <DataGridTextColumn Header="Anmerkung" Binding="{Binding Note}" Width="*" />
+              <DataGridTextColumn Header="{l:Loc ColumnData}" Binding="{Binding Data}" Width="70" />
+              <DataGridTextColumn Header="{l:Loc ColumnType}" Binding="{Binding Kind}" Width="100" />
+              <DataGridTextColumn Header="{l:Loc ColumnRole}" Binding="{Binding RoleText}" Width="110" />
+              <DataGridTextColumn Header="{l:Loc ColumnNote}" Binding="{Binding Note}" Width="*" />
               <DataGridTemplateColumn Header="" Width="100">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate>
-                    <Button Content="Entfernen" Style="{StaticResource LinkButton}"
+                    <Button Content="{l:Loc RemoveButton}" Style="{StaticResource LinkButton}"
                             HorizontalAlignment="Left"
                             Visibility="{Binding IsRemovable, Converter={StaticResource BoolToVis}}"
                             Command="{Binding DataContext.RemoveOverrideCommand,
@@ -156,7 +157,7 @@
 
           <Separator Margin="0,12,0,10" Background="#FF34383F" />
 
-          <TextBlock Style="{StaticResource SectionHeader}" Text="SAFEBOOT-ABSICHERUNG" />
+          <TextBlock Style="{StaticResource SectionHeader}" Text="{l:Loc SafeBootHeader}" />
           <Grid>
             <Grid.ColumnDefinitions>
               <ColumnDefinition Width="Auto" />
@@ -169,20 +170,20 @@
               <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="SafeBoot\Minimal\nvmedisk"
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="{l:Loc SafeBootMinimalPath}"
                        FontFamily="Consolas" Margin="2,0,16,4" />
             <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SafeBootMinimalText}" Margin="0,0,0,4" />
 
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="SafeBoot\Network\nvmedisk"
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="{l:Loc SafeBootNetworkPath}"
                        FontFamily="Consolas" Margin="2,0,16,4" />
             <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SafeBootNetworkText}" Margin="0,0,0,4" />
 
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="Klassen-GUID {75416E63-...}"
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="{l:Loc SafeBootClassGuidLabel}"
                        FontFamily="Consolas" Margin="2,0,16,0" />
             <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SafeBootClassGuidText}"
                        Style="{StaticResource Muted}" TextWrapping="Wrap" />
 
-            <Button Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Content="Anlegen / reparieren"
+            <Button Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Content="{l:Loc CreateSafeBootButton}"
                     Style="{StaticResource LinkButton}" VerticalAlignment="Center"
                     Command="{Binding CreateSafeBootCommand}" />
           </Grid>
@@ -192,7 +193,7 @@
       <!-- ============ Datentraeger ============ -->
       <Border Style="{StaticResource CardPanel}" Margin="0,10,0,0">
         <StackPanel>
-          <TextBlock Style="{StaticResource SectionHeader}" Text="NVME-CONTROLLER UND DATENTRÄGER" />
+          <TextBlock Style="{StaticResource SectionHeader}" Text="{l:Loc ControllersHeader}" />
 
           <!-- Spaltenkopf -->
           <Grid Margin="10,0,10,4">
@@ -203,10 +204,10 @@
               <ColumnDefinition Width="120" />
               <ColumnDefinition Width="50" />
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="Datenträger" Style="{StaticResource SectionHeader}" Margin="0" />
-            <TextBlock Grid.Column="1" Text="Nr." Style="{StaticResource SectionHeader}" Margin="0" />
-            <TextBlock Grid.Column="2" Text="Größe" Style="{StaticResource SectionHeader}" Margin="0" />
-            <TextBlock Grid.Column="3" Text="Treiber" Style="{StaticResource SectionHeader}" Margin="0" />
+            <TextBlock Grid.Column="0" Text="{l:Loc ColumnDisk}" Style="{StaticResource SectionHeader}" Margin="0" />
+            <TextBlock Grid.Column="1" Text="{l:Loc ColumnNumber}" Style="{StaticResource SectionHeader}" Margin="0" />
+            <TextBlock Grid.Column="2" Text="{l:Loc ColumnSize}" Style="{StaticResource SectionHeader}" Margin="0" />
+            <TextBlock Grid.Column="3" Text="{l:Loc ColumnDriver}" Style="{StaticResource SectionHeader}" Margin="0" />
             <TextBlock Grid.Column="4" Text="" Style="{StaticResource SectionHeader}" Margin="0" />
           </Grid>
 
@@ -263,7 +264,7 @@
                     </ItemsControl.ItemTemplate>
                   </ItemsControl>
 
-                  <TextBlock Text="(kein Datenträger)" Margin="10,2,0,0">
+                  <TextBlock Text="{l:Loc NoDisks}" Margin="10,2,0,0">
                     <TextBlock.Style>
                       <Style TargetType="TextBlock" BasedOn="{StaticResource Muted}">
                         <Setter Property="Visibility" Value="Collapsed" />
@@ -288,7 +289,7 @@
 
       <!-- ============ Fusszeile ============ -->
       <DockPanel Margin="4,12,4,0">
-        <Button DockPanel.Dock="Right" Content="Aktualisieren" Style="{StaticResource LinkButton}"
+        <Button DockPanel.Dock="Right" Content="{l:Loc RefreshButton}" Style="{StaticResource LinkButton}"
                 Command="{Binding RefreshCommand}" />
         <StackPanel VerticalAlignment="Center">
           <TextBlock Style="{StaticResource Muted}" Text="{Binding BuildText}" />

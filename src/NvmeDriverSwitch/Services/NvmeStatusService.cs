@@ -151,19 +151,18 @@ namespace NvmeDriverSwitch.Services
                 using (var hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
                 using (var key = hklm.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", false))
                 {
-                    if (key == null) return "unbekannt";
+                    if (key == null) return LocalizedStrings.Get("Unknown");
                     var display = key.GetValue("DisplayVersion") as string;
                     var build = key.GetValue("CurrentBuild") as string;
                     var ubr = key.GetValue("UBR");
                     var edition = key.GetValue("EditionID") as string;
 
-                    return string.Format(CultureInfo.InvariantCulture, "Windows 11 {0} - Build {1}.{2} ({3})",
-                        display, build, ubr, edition);
+                    return LocalizedStrings.Format("WindowsBuildFormat", display, build, ubr, edition);
                 }
             }
             catch (Exception)
             {
-                return "unbekannt";
+                return LocalizedStrings.Get("Unknown");
             }
         }
 

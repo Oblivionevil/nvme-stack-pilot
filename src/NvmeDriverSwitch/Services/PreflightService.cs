@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Management;
 using System.ServiceProcess;
+using NvmeDriverSwitch.Infrastructure;
 using NvmeDriverSwitch.Models;
 
 namespace NvmeDriverSwitch.Services
@@ -47,16 +48,18 @@ namespace NvmeDriverSwitch.Services
                             if (Convert.ToUInt32(o["ProtectionStatus"]) == 0) continue;
 
                             var letter = o["DriveLetter"] as string;
-                            protectedDrives.Add(string.IsNullOrEmpty(letter) ? "(ohne Buchstabe)" : letter);
+                            protectedDrives.Add(string.IsNullOrEmpty(letter)
+                                ? LocalizedStrings.Get("NoDriveLetter")
+                                : letter);
                         }
                     }
 
                     if (protectedDrives.Count > 0)
                     {
                         issues.Add(new PreflightIssue(PreflightSeverity.Warning,
-                            "BitLocker aktiv auf " + string.Join(", ", protectedDrives.ToArray()),
-                            "Wiederherstellungsschlüssel sichern und den Schutz für einen Neustart aussetzen, " +
-                            "bevor der Treiberpfad gewechselt wird."));
+                            LocalizedStrings.Format("BitLockerTitleFormat",
+                                string.Join(", ", protectedDrives.ToArray())),
+                            LocalizedStrings.Get("BitLockerDetail")));
                     }
                 }
             }
@@ -85,9 +88,9 @@ namespace NvmeDriverSwitch.Services
                                 if (!service.Equals(raid, StringComparison.OrdinalIgnoreCase)) continue;
 
                                 issues.Add(new PreflightIssue(PreflightSeverity.Warning,
-                                    "Intel RST / VMD erkannt (" + service + ")",
-                                    "Der native NVMe-Stack sollte bei aktivem RST/VMD nicht eingeschaltet werden: " +
-                                    (o["Name"] as string ?? "unbenanntes Gerät")));
+                                    LocalizedStrings.Format("RaidTitleFormat", service),
+                                    LocalizedStrings.Format("RaidDetailFormat",
+                                        o["Name"] as string ?? LocalizedStrings.Get("UnnamedDevice"))));
                                 return;
                             }
                         }
@@ -111,8 +114,8 @@ namespace NvmeDriverSwitch.Services
                         if (!svc.ServiceName.StartsWith("veracrypt", StringComparison.OrdinalIgnoreCase)) continue;
 
                         issues.Add(new PreflightIssue(PreflightSeverity.Warning,
-                            "VeraCrypt installiert",
-                            "Bei VeraCrypt-Systemverschlüsselung den nativen Stack nicht aktivieren."));
+                            LocalizedStrings.Get("VeraCryptTitle"),
+                            LocalizedStrings.Get("VeraCryptDetail")));
                         return;
                     }
                 }
@@ -139,15 +142,16 @@ namespace NvmeDriverSwitch.Services
                     {
                         using (o)
                         {
-                            pools.Add(o["FriendlyName"] as string ?? "unbenannter Pool");
+                            pools.Add(o["FriendlyName"] as string ?? LocalizedStrings.Get("UnnamedPool"));
                         }
                     }
 
                     if (pools.Count > 0)
                     {
                         issues.Add(new PreflightIssue(PreflightSeverity.Warning,
-                            "Storage Spaces vorhanden: " + string.Join(", ", pools.ToArray()),
-                            "Bei Storage Spaces den nativen Stack nicht aktivieren."));
+                            LocalizedStrings.Format("StorageSpacesTitleFormat",
+                                string.Join(", ", pools.ToArray())),
+                            LocalizedStrings.Get("StorageSpacesDetail")));
                     }
                 }
             }
@@ -159,13 +163,12 @@ namespace NvmeDriverSwitch.Services
 
         private static void AddUnknown(List<PreflightIssue> issues, string checkName, Exception ex)
         {
-            var detail = "Der Zustand konnte nicht sicher ermittelt werden. " +
-                         "Vor dem Umschalten manuell prüfen.";
+            var detail = LocalizedStrings.Get("PreflightUnknownDetail");
             if (ex != null && !string.IsNullOrWhiteSpace(ex.Message))
-                detail += " Technischer Hinweis: " + ex.Message;
+                detail += " " + LocalizedStrings.Format("TechnicalHintFormat", ex.Message);
 
             issues.Add(new PreflightIssue(PreflightSeverity.Warning,
-                checkName + "-Prüfung fehlgeschlagen", detail));
+                LocalizedStrings.Format("PreflightCheckFailedFormat", checkName), detail));
         }
     }
 }

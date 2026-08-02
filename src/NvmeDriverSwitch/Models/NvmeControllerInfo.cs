@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using NvmeDriverSwitch.Infrastructure;
 
 namespace NvmeDriverSwitch.Models
 {
@@ -33,7 +34,12 @@ namespace NvmeDriverSwitch.Models
 
         public string StatusText
         {
-            get { return IsHealthy ? "OK" : "Problemcode " + ConfigManagerErrorCode; }
+            get
+            {
+                return IsHealthy
+                    ? LocalizedStrings.Get("StatusOk")
+                    : LocalizedStrings.Format("ProblemCodeFormat", ConfigManagerErrorCode);
+            }
         }
 
         /// <summary>

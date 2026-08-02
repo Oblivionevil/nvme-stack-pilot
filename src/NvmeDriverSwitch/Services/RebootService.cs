@@ -20,7 +20,7 @@ namespace NvmeDriverSwitch.Services
         public void MarkWritten(StackMode targetMode, string configurationFingerprint)
         {
             if (string.IsNullOrWhiteSpace(configurationFingerprint))
-                throw new ArgumentException("Konfigurations-Fingerprint fehlt.", "configurationFingerprint");
+                throw new ArgumentException(LocalizedStrings.Get("ErrorFingerprintMissing"), "configurationFingerprint");
 
             var now = DateTime.UtcNow;
             string marker = Serialize(new PendingChange
@@ -33,7 +33,7 @@ namespace NvmeDriverSwitch.Services
             using (var key = Registry.CurrentUser.CreateSubKey(StatePath))
             {
                 if (key == null)
-                    throw new InvalidOperationException("Neustart-Marker konnte nicht gespeichert werden.");
+                    throw new InvalidOperationException(LocalizedStrings.Get("ErrorSaveMarker"));
 
                 // Ein einzelner Registry-Wert verhindert gemischte Markerfelder bei Teilfehlern.
                 key.SetValue(PendingChangeValue, marker, RegistryValueKind.String);

@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="StatusRunningLabel" xml:space="preserve">
+    <value>Running:</value>
+  </data>
+  <data name="StatusConfiguredLabel" xml:space="preserve">
+    <value>Configured:</value>
+  </data>
+  <data name="RebootNow" xml:space="preserve">
+    <value>Restart now</value>
+  </data>
+  <data name="IgnoredTitle" xml:space="preserve">
+    <value>Windows ignored the overrides.</value>
+  </data>
+  <data name="IgnoredDetail" xml:space="preserve">
+    <value>A restart has already happened since the values were set, but the state did not change. For newer 24H2 builds, no confirmed registry-only activation is documented; Microsoft officially supports the native stack only on Server 2025. The known workaround is ViVeTool with feature IDs 60786016 and 48433719 — this app deliberately does not call ViVeTool.</value>
+  </data>
+  <data name="ActionsHeader" xml:space="preserve">
+    <value>SWITCH DRIVER</value>
+  </data>
+  <data name="EnableNativeButton" xml:space="preserve">
+    <value>Enable native driver</value>
+  </data>
+  <data name="DisableNativeButton" xml:space="preserve">
+    <value>Revert to classic driver</value>
+  </data>
+  <data name="ActionsDetail" xml:space="preserve">
+    <value>Both actions show the exact registry operations in plain text beforehand. Only the confirmed minimal set is written — other feature overrides remain untouched.</value>
+  </data>
+  <data name="PreflightHeader" xml:space="preserve">
+    <value>PRE-FLIGHT CHECK</value>
+  </data>
+  <data name="RegistryHeader" xml:space="preserve">
+    <value>FEATURE MANAGEMENT OVERRIDES</value>
+  </data>
+  <data name="ColumnValue" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="ColumnData" xml:space="preserve">
+    <value>Data</value>
+  </data>
+  <data name="ColumnType" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="ColumnRole" xml:space="preserve">
+    <value>Role</value>
+  </data>
+  <data name="ColumnNote" xml:space="preserve">
+    <value>Note</value>
+  </data>
+  <data name="RemoveButton" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="SafeBootHeader" xml:space="preserve">
+    <value>SAFEBOOT PROTECTION</value>
+  </data>
+  <data name="SafeBootMinimalPath" xml:space="preserve">
+    <value>SafeBoot\Minimal&#10;nvmedisk</value>
+  </data>
+  <data name="SafeBootNetworkPath" xml:space="preserve">
+    <value>SafeBoot\Network&#10;nvmedisk</value>
+  </data>
+  <data name="SafeBootClassGuidLabel" xml:space="preserve">
+    <value>Class GUID {75416E63-...}</value>
+  </data>
+  <data name="CreateSafeBootButton" xml:space="preserve">
+    <value>Create / repair</value>
+  </data>
+  <data name="ControllersHeader" xml:space="preserve">
+    <value>NVME CONTROLLERS AND DISKS</value>
+  </data>
+  <data name="ColumnDisk" xml:space="preserve">
+    <value>Disk</value>
+  </data>
+  <data name="ColumnNumber" xml:space="preserve">
+    <value>No.</value>
+  </data>
+  <data name="ColumnSize" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="ColumnDriver" xml:space="preserve">
+    <value>Driver</value>
+  </data>
+  <data name="NoDisks" xml:space="preserve">
+    <value>(no disk)</value>
+  </data>
+  <data name="RefreshButton" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="StatusNativeActive" xml:space="preserve">
+    <value>Native NVMe driver ACTIVE</value>
+  </data>
+  <data name="StatusClassicActive" xml:space="preserve">
+    <value>Classic NVMe driver active</value>
+  </data>
+  <data name="RuntimeNative" xml:space="preserve">
+    <value>nvmedisk.sys (native)</value>
+  </data>
+  <data name="RuntimeClassic" xml:space="preserve">
+    <value>stornvme.sys + disk.sys (classic)</value>
+  </data>
+  <data name="ConfiguredNative" xml:space="preserve">
+    <value>native</value>
+  </data>
+  <data name="ConfiguredClassic" xml:space="preserve">
+    <value>classic</value>
+  </data>
+  <data name="VerdictRebootRequired" xml:space="preserve">
+    <value>Restart required</value>
+  </data>
+  <data name="VerdictUntrackedMismatch" xml:space="preserve">
+    <value>Mismatch with unknown origin</value>
+  </data>
+  <data name="VerdictIgnored" xml:space="preserve">
+    <value>Ignored by Windows</value>
+  </data>
+  <data name="VerdictInSync" xml:space="preserve">
+    <value>Configuration and runtime match</value>
+  </data>
+  <data name="RebootBannerTitleMismatch" xml:space="preserve">
+    <value>Configuration and runtime differ.</value>
+  </data>
+  <data name="RebootBannerTitleChanged" xml:space="preserve">
+    <value>The registry was changed — it takes effect only after a restart.</value>
+  </data>
+  <data name="RebootBannerDetailMismatch" xml:space="preserve">
+    <value>The current change was not logged by this app. Check the values; a restart may be required.</value>
+  </data>
+  <data name="RebootBannerDetailChanged" xml:space="preserve">
+    <value>After the restart, the app itself checks whether Windows applied the change.</value>
+  </data>
+  <data name="GhostSingle" xml:space="preserve">
+    <value>1 disconnected NvmeDisk device in the registry — the native stack has already run here.</value>
+  </data>
+  <data name="GhostMany" xml:space="preserve">
+    <value>{0} disconnected NvmeDisk devices in the registry — the native stack has already run here.</value>
+  </data>
+  <data name="SafeBootValid" xml:space="preserve">
+    <value>valid (REG_SZ = Service)</value>
+  </data>
+  <data name="SafeBootInvalid" xml:space="preserve">
+    <value>missing or invalid</value>
+  </data>
+  <data name="SafeBootClassGuidPresent" xml:space="preserve">
+    <value>created by Windows — read only, never changed</value>
+  </data>
+  <data name="SafeBootClassGuidMissing" xml:space="preserve">
+    <value>not present — not created by this app</value>
+  </data>
+  <data name="LastWriteNone" xml:space="preserve">
+    <value>no change made by this app yet</value>
+  </data>
+  <data name="LastWriteFormat" xml:space="preserve">
+    <value>last change {0}</value>
+  </data>
+  <data name="AdminRunning" xml:space="preserve">
+    <value>running as administrator</value>
+  </data>
+  <data name="AdminMissing" xml:space="preserve">
+    <value>WITHOUT administrator rights — write operations will fail</value>
+  </data>
+  <data name="StatusErrorTitle" xml:space="preserve">
+    <value>NVMe Stack Pilot</value>
+  </data>
+  <data name="UnknownError" xml:space="preserve">
+    <value>Unknown error.</value>
+  </data>
+  <data name="UnexpectedErrorTitle" xml:space="preserve">
+    <value>NVMe Stack Pilot - unexpected error</value>
+  </data>
+  <data name="StatusErrorFormat" xml:space="preserve">
+    <value>Status could not be determined:&#10;&#10;{0}</value>
+  </data>
+  <data name="EnableConfirmationTitle" xml:space="preserve">
+    <value>Enable native driver</value>
+  </data>
+  <data name="EnableConfirmationHeader" xml:space="preserve">
+    <value>The following registry changes will be made:</value>
+  </data>
+  <data name="EnableOverrideLineFormat" xml:space="preserve">
+    <value>    {0}   (REG_DWORD) = 1</value>
+  </data>
+  <data name="EnableDefaultValueLine" xml:space="preserve">
+    <value>    (Default)   (REG_SZ) = Service</value>
+  </data>
+  <data name="EnableUntouchedNote" xml:space="preserve">
+    <value>Unknown and independent overrides remain untouched.</value>
+  </data>
+  <data name="EffectiveAfterRestart" xml:space="preserve">
+    <value>Effective only after a restart.</value>
+  </data>
+  <data name="PreflightWarningsHeader" xml:space="preserve">
+    <value>PRE-FLIGHT WARNINGS:</value>
+  </data>
+  <data name="PreflightIssueLineFormat" xml:space="preserve">
+    <value>  • {0}: {1}</value>
+  </data>
+  <data name="PreflightContinueNote" xml:space="preserve">
+    <value>Only continue if these warnings have been checked and resolved.</value>
+  </data>
+  <data name="DisableConfirmationTitle" xml:space="preserve">
+    <value>Revert to the classic NVMe driver</value>
+  </data>
+  <data name="DisableConfirmationHeader" xml:space="preserve">
+    <value>The following values will be deleted:</value>
+  </data>
+  <data name="DisableSafeBootNote" xml:space="preserve">
+    <value>The valid SafeBoot entries remain.</value>
+  </data>
+  <data name="RemoveOverrideTitle" xml:space="preserve">
+    <value>Remove legacy NVMe value</value>
+  </data>
+  <data name="RemoveOverrideFormat" xml:space="preserve">
+    <value>Delete the known legacy NVMe value?&#10;&#10;{0}&#10;    {1}   ({2}) = {3}&#10;&#10;{4}</value>
+  </data>
+  <data name="CreateSafeBootTitle" xml:space="preserve">
+    <value>Create SafeBoot protection</value>
+  </data>
+  <data name="CreateSafeBootFormat" xml:space="preserve">
+    <value>The following keys will be created or repaired:&#10;&#10;{0}&#10;    (Default)   (REG_SZ) = Service&#10;{1}&#10;    (Default)   (REG_SZ) = Service&#10;&#10;This keeps a disk on the native stack reachable in Safe Mode.</value>
+  </data>
+  <data name="RebootConfirmTitle" xml:space="preserve">
+    <value>Restart</value>
+  </data>
+  <data name="RebootConfirmFormat" xml:space="preserve">
+    <value>Restart Windows in 5 seconds?&#10;&#10;Unsaved work will be lost.</value>
+  </data>
+  <data name="OperationFailedTitle" xml:space="preserve">
+    <value>The change failed</value>
+  </data>
+  <data name="OperationFailedFormat" xml:space="preserve">
+    <value>The change failed:&#10;&#10;{0}</value>
+  </data>
+  <data name="RestartFailedTitle" xml:space="preserve">
+    <value>Restart</value>
+  </data>
+  <data name="RestartFailedFormat" xml:space="preserve">
+    <value>Restart failed:&#10;&#10;{0}</value>
+  </data>
+  <data name="RollbackComplete" xml:space="preserve">
+    <value>All started changes were rolled back.</value>
+  </data>
+  <data name="RollbackManualFormat" xml:space="preserve">
+    <value>Manual review required:&#10;- {0}</value>
+  </data>
+  <data name="RollbackFailedFormat" xml:space="preserve">
+    <value>{0} rollback failed: {1}</value>
+  </data>
+  <data name="RollbackSafeBootKept" xml:space="preserve">
+    <value>SafeBoot was deliberately kept because the overrides rollback failed.</value>
+  </data>
+  <data name="OperationActivation" xml:space="preserve">
+    <value>Activation</value>
+  </data>
+  <data name="OperationDeactivation" xml:space="preserve">
+    <value>Deactivation</value>
+  </data>
+  <data name="OperationSafeBootRepair" xml:space="preserve">
+    <value>SafeBoot repair</value>
+  </data>
+  <data name="OperationFailedWithNameFormat" xml:space="preserve">
+    <value>{0} failed: {1}</value>
+  </data>
+  <data name="ErrorVerifyNative" xml:space="preserve">
+    <value>The native configuration could not be verified.</value>
+  </data>
+  <data name="ErrorVerifyClassic" xml:space="preserve">
+    <value>The classic configuration could not be verified.</value>
+  </data>
+  <data name="OverrideNoteActive" xml:space="preserve">
+    <value>active</value>
+  </data>
+  <data name="OverrideNoteWrongValue" xml:space="preserve">
+    <value>present, but not set as REG_DWORD 1</value>
+  </data>
+  <data name="OverrideNoteLegacy" xml:space="preserve">
+    <value>known legacy NVMe value from earlier community guides</value>
+  </data>
+  <data name="OverrideNoteReadOnly" xml:space="preserve">
+    <value>official key for Windows Server 2025; not modified</value>
+  </data>
+  <data name="OverrideNoteUnknown" xml:space="preserve">
+    <value>unknown or independent feature override; not modified</value>
+  </data>
+  <data name="OverrideNoteMissing" xml:space="preserve">
+    <value>not present</value>
+  </data>
+  <data name="ErrorOpenOverridesRollback" xml:space="preserve">
+    <value>The overrides key could not be opened for rollback.</value>
+  </data>
+  <data name="ErrorRestoreOverrides" xml:space="preserve">
+    <value>The previous overrides state could not be fully restored.</value>
+  </data>
+  <data name="ErrorOpenOverrides" xml:space="preserve">
+    <value>The overrides key could not be opened.</value>
+  </data>
+  <data name="ErrorVerifyOverrides" xml:space="preserve">
+    <value>The NVMe overrides could not be fully verified.</value>
+  </data>
+  <data name="ErrorRemoveOverrides" xml:space="preserve">
+    <value>Not all NVMe overrides could be removed.</value>
+  </data>
+  <data name="ErrorLegacyNotRemovable" xml:space="preserve">
+    <value>This value is not approved as a removable NVMe legacy value.</value>
+  </data>
+  <data name="ErrorLegacyRemoveFailed" xml:space="preserve">
+    <value>The NVMe legacy value could not be removed.</value>
+  </data>
+  <data name="RoleMinimal" xml:space="preserve">
+    <value>minimal set</value>
+  </data>
+  <data name="RoleMissing" xml:space="preserve">
+    <value>missing</value>
+  </data>
+  <data name="RoleLegacy" xml:space="preserve">
+    <value>legacy</value>
+  </data>
+  <data name="RoleUnknown" xml:space="preserve">
+    <value>unknown</value>
+  </data>
+  <data name="NoDriveLetter" xml:space="preserve">
+    <value>(no drive letter)</value>
+  </data>
+  <data name="BitLockerTitleFormat" xml:space="preserve">
+    <value>BitLocker active on {0}</value>
+  </data>
+  <data name="BitLockerDetail" xml:space="preserve">
+    <value>Back up the recovery key and suspend protection for a restart before switching the driver path.</value>
+  </data>
+  <data name="RaidTitleFormat" xml:space="preserve">
+    <value>Intel RST / VMD detected ({0})</value>
+  </data>
+  <data name="RaidDetailFormat" xml:space="preserve">
+    <value>The native NVMe stack should not be enabled with active RST/VMD: {0}</value>
+  </data>
+  <data name="UnnamedDevice" xml:space="preserve">
+    <value>unnamed device</value>
+  </data>
+  <data name="VeraCryptTitle" xml:space="preserve">
+    <value>VeraCrypt installed</value>
+  </data>
+  <data name="VeraCryptDetail" xml:space="preserve">
+    <value>Do not enable the native stack with VeraCrypt system encryption.</value>
+  </data>
+  <data name="StorageSpacesTitleFormat" xml:space="preserve">
+    <value>Storage Spaces present: {0}</value>
+  </data>
+  <data name="UnnamedPool" xml:space="preserve">
+    <value>unnamed pool</value>
+  </data>
+  <data name="StorageSpacesDetail" xml:space="preserve">
+    <value>Do not enable the native stack with Storage Spaces.</value>
+  </data>
+  <data name="PreflightUnknownDetail" xml:space="preserve">
+    <value>The state could not be determined reliably. Check manually before switching.</value>
+  </data>
+  <data name="TechnicalHintFormat" xml:space="preserve">
+    <value>Technical hint: {0}</value>
+  </data>
+  <data name="PreflightCheckFailedFormat" xml:space="preserve">
+    <value>{0} check failed</value>
+  </data>
+  <data name="ErrorOpenSafeBootRollback" xml:space="preserve">
+    <value>SafeBoot key could not be opened for rollback.</value>
+  </data>
+  <data name="ErrorRestoreSafeBoot" xml:space="preserve">
+    <value>The previous SafeBoot state could not be fully restored.</value>
+  </data>
+  <data name="ErrorVerifySafeBoot" xml:space="preserve">
+    <value>SafeBoot protection could not be fully verified.</value>
+  </data>
+  <data name="ErrorOpenSafeBootFormat" xml:space="preserve">
+    <value>SafeBoot key could not be opened: {0}</value>
+  </data>
+  <data name="ErrorUnknownSafeBootSet" xml:space="preserve">
+    <value>Unknown SafeBoot set.</value>
+  </data>
+  <data name="ErrorFingerprintMissing" xml:space="preserve">
+    <value>Configuration fingerprint is missing.</value>
+  </data>
+  <data name="ErrorSaveMarker" xml:space="preserve">
+    <value>Restart marker could not be saved.</value>
+  </data>
+  <data name="Unknown" xml:space="preserve">
+    <value>unknown</value>
+  </data>
+  <data name="WindowsBuildFormat" xml:space="preserve">
+    <value>Windows 11 {0} - Build {1}.{2} ({3})</value>
+  </data>
+  <data name="StatusOk" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="ProblemCodeFormat" xml:space="preserve">
+    <value>Problem code {0}</value>
+  </data>
+  <data name="BootText" xml:space="preserve">
+    <value>Boot</value>
+  </data>
+  <data name="DiskNumberFormat" xml:space="preserve">
+    <value>Disk {0}</value>
+  </data>
+  <data name="SizeGbFormat" xml:space="preserve">
+    <value>{0} GB</value>
+  </data>
+  <data name="SizeTbFormat" xml:space="preserve">
+    <value>{0} TB</value>
+  </data>
+</root>

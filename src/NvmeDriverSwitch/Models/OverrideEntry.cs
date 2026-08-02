@@ -1,3 +1,5 @@
+using NvmeDriverSwitch.Infrastructure;
+
 namespace NvmeDriverSwitch.Models
 {
     public enum OverrideRole
@@ -41,10 +43,10 @@ namespace NvmeDriverSwitch.Models
             {
                 switch (Role)
                 {
-                    case OverrideRole.Minimal: return "Minimalsatz";
-                    case OverrideRole.Missing: return "fehlt";
-                    case OverrideRole.Legacy: return "Altwert";
-                    default: return "unbekannt";
+                    case OverrideRole.Minimal: return LocalizedStrings.Get("RoleMinimal");
+                    case OverrideRole.Missing: return LocalizedStrings.Get("RoleMissing");
+                    case OverrideRole.Legacy: return LocalizedStrings.Get("RoleLegacy");
+                    default: return LocalizedStrings.Get("RoleUnknown");
                 }
             }
         }
