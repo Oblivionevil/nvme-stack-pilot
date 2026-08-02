@@ -111,8 +111,6 @@ jobs:
 
           New-Item -ItemType Directory -Path $packageDirectory -Force | Out-Null
           Copy-Item -LiteralPath (Join-Path $buildDirectory 'NvmeStackPilot.exe') -Destination $packageDirectory
-          Copy-Item -LiteralPath (Join-Path $buildDirectory 'NvmeStackPilot.exe.config') -Destination $packageDirectory
-          Copy-Item -LiteralPath (Join-Path $env:GITHUB_WORKSPACE 'README.md') -Destination $packageDirectory
 
           Compress-Archive -Path (Join-Path $packageDirectory '*') -DestinationPath $archivePath
 
