@@ -1,4 +1,5 @@
 using System;
+using NvmeDriverSwitch.Infrastructure;
 
 namespace NvmeDriverSwitch.Models
 {
@@ -40,7 +41,7 @@ namespace NvmeDriverSwitch.Models
 
         public string BootText
         {
-            get { return IsBootDisk ? "Boot" : ""; }
+            get { return IsBootDisk ? LocalizedStrings.Get("BootText") : ""; }
         }
 
         public string SizeText
@@ -49,14 +50,15 @@ namespace NvmeDriverSwitch.Models
             {
                 if (SizeBytes <= 0) return "-";
                 double gb = SizeBytes / 1000d / 1000d / 1000d;
-                if (gb >= 1000d) return (gb / 1000d).ToString("0.##") + " TB";
-                return gb.ToString("0") + " GB";
+                if (gb >= 1000d)
+                    return LocalizedStrings.Format("SizeTbFormat", (gb / 1000d).ToString("0.##"));
+                return LocalizedStrings.Format("SizeGbFormat", gb.ToString("0"));
             }
         }
 
         public string DiskNumberText
         {
-            get { return DiskNumber.HasValue ? "Disk " + DiskNumber.Value : "-"; }
+            get { return DiskNumber.HasValue ? LocalizedStrings.Format("DiskNumberFormat", DiskNumber.Value) : "-"; }
         }
     }
 }

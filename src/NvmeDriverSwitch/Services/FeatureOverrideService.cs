@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Win32;
+using NvmeDriverSwitch.Infrastructure;
 using NvmeDriverSwitch.Models;
 
 namespace NvmeDriverSwitch.Services
@@ -31,15 +32,15 @@ namespace NvmeDriverSwitch.Services
         private static readonly Dictionary<string, string> KnownLegacy =
             new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
-                { "735209102",  "bekannter NVMe-Altwert aus früheren Sammelanleitungen" },
-                { "1409234060", "bekannter NVMe-Altwert aus früheren Sammelanleitungen" }
+                { "735209102",  LocalizedStrings.Get("OverrideNoteLegacy") },
+                { "1409234060", LocalizedStrings.Get("OverrideNoteLegacy") }
             };
 
         /// <summary>Bekannte, aber bewusst schreibgeschuetzte Werte anderer Plattformen.</summary>
         private static readonly Dictionary<string, string> KnownReadOnly =
             new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
-                { "1176759950", "offizieller Schlüssel für Windows Server 2025; wird nicht verändert" }
+                { "1176759950", LocalizedStrings.Get("OverrideNoteReadOnly") }
             };
 
         public sealed class State
@@ -109,7 +110,9 @@ namespace NvmeDriverSwitch.Services
                                 Data = Describe(valueState.Value),
                                 Kind = DescribeKind(valueState.Kind),
                                 Role = enabled ? OverrideRole.Minimal : OverrideRole.Missing,
-                                Note = enabled ? "aktiv" : "vorhanden, aber nicht als REG_DWORD 1 gesetzt"
+                                Note = enabled
+                                    ? LocalizedStrings.Get("OverrideNoteActive")
+                                    : LocalizedStrings.Get("OverrideNoteWrongValue")
                             });
                             continue;
                         }
@@ -124,7 +127,7 @@ namespace NvmeDriverSwitch.Services
                         {
                             role = OverrideRole.Unknown;
                             if (!KnownReadOnly.TryGetValue(name, out note))
-                                note = "unbekannter oder unabhängiger Feature-Override; wird nicht verändert";
+                                note = LocalizedStrings.Get("OverrideNoteUnknown");
                         }
 
                         entries.Add(new OverrideEntry
@@ -147,7 +150,7 @@ namespace NvmeDriverSwitch.Services
                         Data = "-",
                         Kind = "-",
                         Role = OverrideRole.Missing,
-                        Note = "nicht vorhanden"
+                        Note = LocalizedStrings.Get("OverrideNoteMissing")
                     });
                 }
 
@@ -182,7 +185,7 @@ namespace NvmeDriverSwitch.Services
             using (var key = hklm.CreateSubKey(OverridesPath))
             {
                 if (key == null)
-                    throw new InvalidOperationException("Overrides-Schlüssel konnte für das Rollback nicht geöffnet werden.");
+                    throw new InvalidOperationException(LocalizedStrings.Get("ErrorOpenOverridesRollback"));
 
                 foreach (var name in MinimalNames)
                 {
@@ -195,7 +198,7 @@ namespace NvmeDriverSwitch.Services
 
                 var restored = ReadMinimalStates(key);
                 if (!StatesEqual(snapshot.Values, restored))
-                    throw new InvalidOperationException("Der vorherige Overrides-Zustand konnte nicht vollständig wiederhergestellt werden.");
+                    throw new InvalidOperationException(LocalizedStrings.Get("ErrorRestoreOverrides"));
             }
         }
 
@@ -205,14 +208,14 @@ namespace NvmeDriverSwitch.Services
             using (var key = hklm.CreateSubKey(OverridesPath))
             {
                 if (key == null)
-                    throw new InvalidOperationException("Overrides-Schlüssel konnte nicht geöffnet werden.");
+                    throw new InvalidOperationException(LocalizedStrings.Get("ErrorOpenOverrides"));
 
                 foreach (var name in MinimalNames)
                     key.SetValue(name, 1, RegistryValueKind.DWord);
 
                 var written = ReadMinimalStates(key);
                 if (!MinimalNames.All(n => IsExactDwordOne(written[n])))
-                    throw new InvalidOperationException("Die NVMe-Overrides konnten nicht vollständig verifiziert werden.");
+                    throw new InvalidOperationException(LocalizedStrings.Get("ErrorVerifyOverrides"));
             }
         }
 
@@ -228,7 +231,7 @@ namespace NvmeDriverSwitch.Services
 
                 var remaining = ReadMinimalStates(key);
                 if (MinimalNames.Any(n => remaining[n].Exists))
-                    throw new InvalidOperationException("Nicht alle NVMe-Overrides konnten entfernt werden.");
+                    throw new InvalidOperationException(LocalizedStrings.Get("ErrorRemoveOverrides"));
             }
         }
 
@@ -236,7 +239,7 @@ namespace NvmeDriverSwitch.Services
         public void RemoveLegacyValue(string name)
         {
             if (string.IsNullOrEmpty(name) || !KnownLegacy.ContainsKey(name))
-                throw new InvalidOperationException("Dieser Wert ist nicht als entfernbarer NVMe-Altwert freigegeben.");
+                throw new InvalidOperationException(LocalizedStrings.Get("ErrorLegacyNotRemovable"));
 
             using (var hklm = OpenHklm())
             using (var key = hklm.OpenSubKey(OverridesPath, true))
@@ -245,7 +248,7 @@ namespace NvmeDriverSwitch.Services
                 key.DeleteValue(name, false);
 
                 if (key.GetValueNames().Contains(name, StringComparer.OrdinalIgnoreCase))
-                    throw new InvalidOperationException("Der NVMe-Altwert konnte nicht entfernt werden.");
+                    throw new InvalidOperationException(LocalizedStrings.Get("ErrorLegacyRemoveFailed"));
             }
         }
 

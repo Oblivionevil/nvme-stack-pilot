@@ -19,6 +19,8 @@
     <!-- Quelldateien liegen als UTF-8 ohne BOM vor; ohne das interpretiert csc sie in der Systemcodepage. -->
     <CodePage>65001</CodePage>
     <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+    <!-- Keine separate .exe.config erzeugen: die App bleibt eine einzelne EXE. -->
+    <GenerateSupportedRuntime>false</GenerateSupportedRuntime>
   </PropertyGroup>
 
   <ItemGroup>

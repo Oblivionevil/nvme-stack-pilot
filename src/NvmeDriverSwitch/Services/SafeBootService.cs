@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Win32;
+using NvmeDriverSwitch.Infrastructure;
 
 namespace NvmeDriverSwitch.Services
 {
@@ -114,7 +115,7 @@ namespace NvmeDriverSwitch.Services
                     using (var key = hklm.CreateSubKey(PathFor(setName)))
                     {
                         if (key == null)
-                            throw new InvalidOperationException("SafeBoot-Schlüssel konnte für das Rollback nicht geöffnet werden.");
+                            throw new InvalidOperationException(LocalizedStrings.Get("ErrorOpenSafeBootRollback"));
 
                         if (state.DefaultValueExists)
                             key.SetValue(null, CloneValue(state.Value), state.Kind);
@@ -126,7 +127,7 @@ namespace NvmeDriverSwitch.Services
 
             var restored = CaptureSnapshot();
             if (!StatesEqual(snapshot.States, restored.States))
-                throw new InvalidOperationException("Der vorherige SafeBoot-Zustand konnte nicht vollständig wiederhergestellt werden.");
+                throw new InvalidOperationException(LocalizedStrings.Get("ErrorRestoreSafeBoot"));
         }
 
         public void Create()
@@ -135,7 +136,7 @@ namespace NvmeDriverSwitch.Services
                 CreateOne(setName);
 
             if (!SetNames.All(IsValid))
-                throw new InvalidOperationException("Die SafeBoot-Absicherung konnte nicht vollständig verifiziert werden.");
+                throw new InvalidOperationException(LocalizedStrings.Get("ErrorVerifySafeBoot"));
         }
 
         public void Remove()
@@ -156,7 +157,8 @@ namespace NvmeDriverSwitch.Services
             using (var key = hklm.CreateSubKey(PathFor(setName)))
             {
                 if (key == null)
-                    throw new InvalidOperationException("SafeBoot-Schlüssel konnte nicht geöffnet werden: " + setName);
+                    throw new InvalidOperationException(
+                        LocalizedStrings.Format("ErrorOpenSafeBootFormat", setName));
                 key.SetValue(null, "Service", RegistryValueKind.String);
             }
         }
@@ -179,7 +181,7 @@ namespace NvmeDriverSwitch.Services
         private static void ValidateSetName(string setName)
         {
             if (!SetNames.Contains(setName, StringComparer.OrdinalIgnoreCase))
-                throw new ArgumentOutOfRangeException("setName", "Unbekannter SafeBoot-Satz.");
+                throw new ArgumentOutOfRangeException("setName", LocalizedStrings.Get("ErrorUnknownSafeBootSet"));
         }
 
         private static KeyState ReadKeyState(RegistryKey key)

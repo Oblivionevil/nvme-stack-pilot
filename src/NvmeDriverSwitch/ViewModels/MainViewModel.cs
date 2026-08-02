@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Security.Principal;
 using System.Text;
@@ -187,7 +188,7 @@ namespace NvmeDriverSwitch.ViewModels
             private set { SetField(ref _buildText, value); }
         }
 
-        private string _lastWriteText = "noch keine Änderung durch diese App";
+        private string _lastWriteText = LocalizedStrings.Get("LastWriteNone");
         public string LastWriteText
         {
             get { return _lastWriteText; }
@@ -201,8 +202,8 @@ namespace NvmeDriverSwitch.ViewModels
             get
             {
                 return RuntimeMode == StackMode.Native
-                    ? "Nativer NVMe-Treiber AKTIV"
-                    : "Klassischer NVMe-Treiber aktiv";
+                    ? LocalizedStrings.Get("StatusNativeActive")
+                    : LocalizedStrings.Get("StatusClassicActive");
             }
         }
 
@@ -211,14 +212,19 @@ namespace NvmeDriverSwitch.ViewModels
             get
             {
                 return RuntimeMode == StackMode.Native
-                    ? "nvmedisk.sys (nativ)"
-                    : "stornvme.sys + disk.sys (klassisch)";
+                    ? LocalizedStrings.Get("RuntimeNative")
+                    : LocalizedStrings.Get("RuntimeClassic");
             }
         }
 
         public string ConfiguredModeText
         {
-            get { return ConfiguredMode == StackMode.Native ? "nativ" : "klassisch"; }
+            get
+            {
+                return ConfiguredMode == StackMode.Native
+                    ? LocalizedStrings.Get("ConfiguredNative")
+                    : LocalizedStrings.Get("ConfiguredClassic");
+            }
         }
 
         public string VerdictText
@@ -228,13 +234,13 @@ namespace NvmeDriverSwitch.ViewModels
                 switch (CurrentVerdict)
                 {
                     case Verdict.RebootRequired:
-                        return "Neustart erforderlich";
+                        return LocalizedStrings.Get("VerdictRebootRequired");
                     case Verdict.UntrackedMismatch:
-                        return "Abweichung mit unbekanntem Ursprung";
+                        return LocalizedStrings.Get("VerdictUntrackedMismatch");
                     case Verdict.IgnoredByWindows:
-                        return "Von Windows ignoriert";
+                        return LocalizedStrings.Get("VerdictIgnored");
                     default:
-                        return "Konfiguration und Laufzeit stimmen überein";
+                        return LocalizedStrings.Get("VerdictInSync");
                 }
             }
         }
@@ -283,8 +289,8 @@ namespace NvmeDriverSwitch.ViewModels
             get
             {
                 return CurrentVerdict == Verdict.UntrackedMismatch
-                    ? "Konfiguration und Laufzeit weichen voneinander ab."
-                    : "Die Registry wurde geändert - wirksam wird das erst nach einem Neustart.";
+                    ? LocalizedStrings.Get("RebootBannerTitleMismatch")
+                    : LocalizedStrings.Get("RebootBannerTitleChanged");
             }
         }
 
@@ -293,8 +299,8 @@ namespace NvmeDriverSwitch.ViewModels
             get
             {
                 return CurrentVerdict == Verdict.UntrackedMismatch
-                    ? "Die aktuelle Änderung wurde nicht von dieser App protokolliert. Werte prüfen; ein Neustart kann erforderlich sein."
-                    : "Nach dem Neustart prüft die App selbst, ob Windows die Änderung übernommen hat.";
+                    ? LocalizedStrings.Get("RebootBannerDetailMismatch")
+                    : LocalizedStrings.Get("RebootBannerDetailChanged");
             }
         }
 
@@ -318,19 +324,29 @@ namespace NvmeDriverSwitch.ViewModels
             get
             {
                 return GhostCount == 1
-                    ? "1 getrenntes NvmeDisk-Gerät in der Registry - der native Stack lief hier bereits."
-                    : GhostCount + " getrennte NvmeDisk-Geräte in der Registry - der native Stack lief hier bereits.";
+                    ? LocalizedStrings.Get("GhostSingle")
+                    : LocalizedStrings.Format("GhostMany", GhostCount);
             }
         }
 
         public string SafeBootMinimalText
         {
-            get { return SafeBootMinimalPresent ? "gültig (REG_SZ = Service)" : "fehlt oder ist ungültig"; }
+            get
+            {
+                return SafeBootMinimalPresent
+                    ? LocalizedStrings.Get("SafeBootValid")
+                    : LocalizedStrings.Get("SafeBootInvalid");
+            }
         }
 
         public string SafeBootNetworkText
         {
-            get { return SafeBootNetworkPresent ? "gültig (REG_SZ = Service)" : "fehlt oder ist ungültig"; }
+            get
+            {
+                return SafeBootNetworkPresent
+                    ? LocalizedStrings.Get("SafeBootValid")
+                    : LocalizedStrings.Get("SafeBootInvalid");
+            }
         }
 
         public string SafeBootClassGuidText
@@ -338,8 +354,8 @@ namespace NvmeDriverSwitch.ViewModels
             get
             {
                 return SafeBootClassGuidPresent
-                    ? "von Windows angelegt - wird nur gelesen, nie verändert"
-                    : "nicht vorhanden - wird von dieser App nicht angelegt";
+                    ? LocalizedStrings.Get("SafeBootClassGuidPresent")
+                    : LocalizedStrings.Get("SafeBootClassGuidMissing");
             }
         }
 
@@ -361,8 +377,8 @@ namespace NvmeDriverSwitch.ViewModels
                 {
                     var principal = new WindowsPrincipal(id);
                     return principal.IsInRole(WindowsBuiltInRole.Administrator)
-                        ? "als Administrator"
-                        : "OHNE Administratorrechte - Schreibzugriffe schlagen fehl";
+                        ? LocalizedStrings.Get("AdminRunning")
+                        : LocalizedStrings.Get("AdminMissing");
                 }
             }
         }
@@ -394,8 +410,8 @@ namespace NvmeDriverSwitch.ViewModels
             {
                 _hasSnapshot = false;
                 CommandManager.InvalidateRequerySuggested();
-                MessageBox.Show("Status konnte nicht ermittelt werden:\n\n" + ex.Message,
-                    "NVMe Stack Pilot", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(LocalizedStrings.Format("StatusErrorFormat", ex.Message),
+                    LocalizedStrings.Get("StatusErrorTitle"), MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             finally
             {
@@ -451,8 +467,9 @@ namespace NvmeDriverSwitch.ViewModels
             BuildText = s.WindowsBuild;
 
             LastWriteText = s.LastWriteUtc.HasValue
-                ? "letzte Änderung " + s.LastWriteUtc.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
-                : "noch keine Änderung durch diese App";
+                ? LocalizedStrings.Format("LastWriteFormat",
+                    s.LastWriteUtc.Value.ToLocalTime().ToString("g", CultureInfo.CurrentCulture))
+                : LocalizedStrings.Get("LastWriteNone");
 
             _hasSnapshot = true;
             if (s.Verdict == Verdict.InSync && s.PendingChange != null)
@@ -518,34 +535,34 @@ namespace NvmeDriverSwitch.ViewModels
         private void EnableNative()
         {
             ExecuteConfirmedMutation(BuildEnableConfirmation,
-                "Nativen NVMe-Treiber aktivieren", EnableNativeAtomically);
+                LocalizedStrings.Get("EnableConfirmationTitle"), EnableNativeAtomically);
         }
 
         private string BuildEnableConfirmation()
         {
             var sb = new StringBuilder();
-            sb.AppendLine("Folgende Registry-Änderungen werden vorgenommen:");
+            sb.AppendLine(LocalizedStrings.Get("EnableConfirmationHeader"));
             sb.AppendLine();
             sb.AppendLine(FeatureOverrideService.OverridesDisplayPath);
             foreach (var name in FeatureOverrideService.MinimalSet)
-                sb.AppendLine("    " + name + "   (REG_DWORD) = 1");
+                sb.AppendLine(LocalizedStrings.Format("EnableOverrideLineFormat", name));
             sb.AppendLine();
             sb.AppendLine(_safeBoot.MinimalDisplayPath);
-            sb.AppendLine("    (Standard)   (REG_SZ) = Service");
+            sb.AppendLine(LocalizedStrings.Get("EnableDefaultValueLine"));
             sb.AppendLine(_safeBoot.NetworkDisplayPath);
-            sb.AppendLine("    (Standard)   (REG_SZ) = Service");
+            sb.AppendLine(LocalizedStrings.Get("EnableDefaultValueLine"));
             sb.AppendLine();
-            sb.AppendLine("Unbekannte und unabhängige Overrides bleiben unangetastet.");
-            sb.AppendLine("Wirksam erst nach einem Neustart.");
+            sb.AppendLine(LocalizedStrings.Get("EnableUntouchedNote"));
+            sb.AppendLine(LocalizedStrings.Get("EffectiveAfterRestart"));
 
             if (PreflightIssues.Count > 0)
             {
                 sb.AppendLine();
-                sb.AppendLine("VORFLUGHINWEISE:");
+                sb.AppendLine(LocalizedStrings.Get("PreflightWarningsHeader"));
                 foreach (var issue in PreflightIssues)
-                    sb.AppendLine("  • " + issue.Title + ": " + issue.Detail);
+                    sb.AppendLine(LocalizedStrings.Format("PreflightIssueLineFormat", issue.Title, issue.Detail));
                 sb.AppendLine();
-                sb.AppendLine("Nur fortfahren, wenn diese Hinweise geprüft und geklärt wurden.");
+                sb.AppendLine(LocalizedStrings.Get("PreflightContinueNote"));
             }
 
             return sb.ToString();
@@ -565,7 +582,7 @@ namespace NvmeDriverSwitch.ViewModels
 
                 var written = _overrides.ReadState();
                 if (!written.IsNativeConfigured)
-                    throw new InvalidOperationException("Die native Konfiguration konnte nicht verifiziert werden.");
+                    throw new InvalidOperationException(LocalizedStrings.Get("ErrorVerifyNative"));
 
                 _reboot.MarkWritten(StackMode.Native, written.Fingerprint);
             }
@@ -583,30 +600,30 @@ namespace NvmeDriverSwitch.ViewModels
                 }
                 else
                 {
-                    rollbackErrors.Add("SafeBoot wurde vorsorglich beibehalten, weil das Overrides-Rollback fehlschlug.");
+                    rollbackErrors.Add(LocalizedStrings.Get("RollbackSafeBootKept"));
                 }
 
-                throw BuildRollbackException("Aktivierung", operationError, rollbackErrors);
+                throw BuildRollbackException(LocalizedStrings.Get("OperationActivation"), operationError, rollbackErrors);
             }
         }
 
         private void DisableNative()
         {
             ExecuteConfirmedMutation(BuildDisableConfirmation,
-                "Zurück auf den klassischen NVMe-Treiber", DisableNativeAtomically);
+                LocalizedStrings.Get("DisableConfirmationTitle"), DisableNativeAtomically);
         }
 
         private string BuildDisableConfirmation()
         {
             var sb = new StringBuilder();
-            sb.AppendLine("Folgende Werte werden gelöscht:");
+            sb.AppendLine(LocalizedStrings.Get("DisableConfirmationHeader"));
             sb.AppendLine();
             sb.AppendLine(FeatureOverrideService.OverridesDisplayPath);
             foreach (var name in FeatureOverrideService.MinimalSet)
                 sb.AppendLine("    " + name);
             sb.AppendLine();
-            sb.AppendLine("Die gültigen SafeBoot-Einträge bleiben bestehen.");
-            sb.AppendLine("Wirksam erst nach einem Neustart.");
+            sb.AppendLine(LocalizedStrings.Get("DisableSafeBootNote"));
+            sb.AppendLine(LocalizedStrings.Get("EffectiveAfterRestart"));
             return sb.ToString();
         }
 
@@ -618,7 +635,7 @@ namespace NvmeDriverSwitch.ViewModels
                 _overrides.DisableNative();
                 var written = _overrides.ReadState();
                 if (written.HasAnyMinimalValue)
-                    throw new InvalidOperationException("Die klassische Konfiguration konnte nicht verifiziert werden.");
+                    throw new InvalidOperationException(LocalizedStrings.Get("ErrorVerifyClassic"));
 
                 _reboot.MarkWritten(StackMode.Classic, written.Fingerprint);
             }
@@ -627,7 +644,7 @@ namespace NvmeDriverSwitch.ViewModels
                 var rollbackErrors = new List<string>();
                 TryRollback(() => _overrides.RestoreMinimalSnapshot(overrideBefore),
                     "Overrides", rollbackErrors);
-                throw BuildRollbackException("Deaktivierung", operationError, rollbackErrors);
+                throw BuildRollbackException(LocalizedStrings.Get("OperationDeactivation"), operationError, rollbackErrors);
             }
         }
 
@@ -637,22 +654,18 @@ namespace NvmeDriverSwitch.ViewModels
             if (entry == null || !entry.IsRemovable) return;
 
             ExecuteConfirmedMutation(
-                () => "Bekannten NVMe-Altwert löschen?\n\n" +
-                      FeatureOverrideService.OverridesDisplayPath +
-                      "\n    " + entry.Name + "   (" + entry.Kind + ") = " + entry.Data +
-                      "\n\n" + entry.Note,
-                "NVMe-Altwert entfernen",
+                () => LocalizedStrings.Format("RemoveOverrideFormat",
+                    FeatureOverrideService.OverridesDisplayPath, entry.Name, entry.Kind, entry.Data, entry.Note),
+                LocalizedStrings.Get("RemoveOverrideTitle"),
                 () => _overrides.RemoveLegacyValue(entry.Name));
         }
 
         private void CreateSafeBoot()
         {
             ExecuteConfirmedMutation(
-                () => "Folgende Schlüssel werden angelegt oder repariert:\n\n" +
-                      _safeBoot.MinimalDisplayPath + "\n    (Standard)   (REG_SZ) = Service\n" +
-                      _safeBoot.NetworkDisplayPath + "\n    (Standard)   (REG_SZ) = Service\n\n" +
-                      "Damit bleibt ein Datenträger am nativen Stack auch im abgesicherten Modus erreichbar.",
-                "SafeBoot-Absicherung anlegen", CreateSafeBootAtomically);
+                () => LocalizedStrings.Format("CreateSafeBootFormat",
+                    _safeBoot.MinimalDisplayPath, _safeBoot.NetworkDisplayPath),
+                LocalizedStrings.Get("CreateSafeBootTitle"), CreateSafeBootAtomically);
         }
 
         private void CreateSafeBootAtomically()
@@ -666,7 +679,7 @@ namespace NvmeDriverSwitch.ViewModels
             {
                 var rollbackErrors = new List<string>();
                 TryRollback(() => _safeBoot.RestoreSnapshot(before), "SafeBoot", rollbackErrors);
-                throw BuildRollbackException("SafeBoot-Reparatur", operationError, rollbackErrors);
+                throw BuildRollbackException(LocalizedStrings.Get("OperationSafeBootRepair"), operationError, rollbackErrors);
             }
         }
 
@@ -676,14 +689,14 @@ namespace NvmeDriverSwitch.ViewModels
 
             try
             {
-                if (!Confirm("Windows in 5 Sekunden neu starten?\n\nNicht gespeicherte Arbeiten gehen verloren.",
-                        "Neustart")) return;
+                if (!Confirm(LocalizedStrings.Get("RebootConfirmFormat"),
+                        LocalizedStrings.Get("RebootConfirmTitle"))) return;
                 _reboot.Reboot();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Neustart fehlgeschlagen:\n\n" + ex.Message,
-                    "NVMe Stack Pilot", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(LocalizedStrings.Format("RestartFailedFormat", ex.Message),
+                    LocalizedStrings.Get("RestartFailedTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -701,8 +714,8 @@ namespace NvmeDriverSwitch.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Die Änderung ist fehlgeschlagen:\n\n" + DescribeException(ex),
-                    "NVMe Stack Pilot", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(LocalizedStrings.Format("OperationFailedFormat", DescribeException(ex)),
+                    LocalizedStrings.Get("OperationFailedTitle"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -745,7 +758,7 @@ namespace NvmeDriverSwitch.ViewModels
             }
             catch (Exception ex)
             {
-                errors.Add(label + "-Rollback fehlgeschlagen: " + ex.Message);
+                errors.Add(LocalizedStrings.Format("RollbackFailedFormat", label, ex.Message));
                 return false;
             }
         }
@@ -753,12 +766,13 @@ namespace NvmeDriverSwitch.ViewModels
         private static Exception BuildRollbackException(string operation, Exception original,
             List<string> rollbackErrors)
         {
-            var message = operation + " fehlgeschlagen: " + original.Message;
+            var message = LocalizedStrings.Format("OperationFailedWithNameFormat", operation, original.Message);
             if (rollbackErrors.Count == 0)
-                message += "\n\nAlle begonnenen Änderungen wurden zurückgesetzt.";
+                message += "\n\n" + LocalizedStrings.Get("RollbackComplete");
             else
-                message += "\n\nManuelle Prüfung erforderlich:\n- " +
-                           string.Join("\n- ", rollbackErrors.ToArray());
+                message += "\n\n" +
+                           LocalizedStrings.Format("RollbackManualFormat",
+                               string.Join("\n- ", rollbackErrors.ToArray()));
             return new InvalidOperationException(message, original);
         }
 

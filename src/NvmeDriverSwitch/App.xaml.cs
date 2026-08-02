@@ -1,6 +1,8 @@
 using System;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Threading;
+using NvmeDriverSwitch.Infrastructure;
 
 namespace NvmeDriverSwitch
 {
@@ -8,6 +10,11 @@ namespace NvmeDriverSwitch
     {
         protected override void OnStartup(StartupEventArgs e)
         {
+            // Die UI-Kultur folgt der Windows-Sprache und gilt damit auch fuer
+            // Hintergrund-Threads (Snapshot-Lesungen in Task.Run).
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CurrentCulture;
+            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.CurrentUICulture;
+
             DispatcherUnhandledException += OnDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
             base.OnStartup(e);
@@ -27,8 +34,8 @@ namespace NvmeDriverSwitch
         private static void Report(Exception ex)
         {
             MessageBox.Show(
-                ex == null ? "Unbekannter Fehler." : ex.ToString(),
-                "NVMe Stack Pilot - unerwarteter Fehler",
+                ex == null ? LocalizedStrings.Get("UnknownError") : ex.ToString(),
+                LocalizedStrings.Get("UnexpectedErrorTitle"),
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
         }
